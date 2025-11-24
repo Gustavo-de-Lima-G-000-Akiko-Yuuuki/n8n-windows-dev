@@ -15,6 +15,15 @@ O n8n é uma plataforma de automação de fluxos de trabalho (workflow automatio
 - **Controle Total**: Hospede você mesmo (*self-host*) com nossa licença *fair-code* ou use nossa [oferta na nuvem](https://app.n8n.cloud/login).
 - **Pronto para Empresas**: Permissões avançadas, SSO e implantações *air-gapped* (isoladas).
 - **Comunidade Ativa**: Mais de 400 integrações e mais de 900 [modelos](https://n8n.io/workflows) prontos para uso.
+- 
+## Início Rápido Para Windows 10 / 11
+
+Experimente o n8n instantaneamente automatizado para windows 10 e 11 com [RUN_WINDOWS.bat](https://github.com/Gustavo-de-Lima-G-000-Akiko-Yuuuki/n8n-windows-dev/blob/master/RUN_WINDOWS.bat) :
+
+```
+Apenas baixe o repositorio descompacte o zip do repositorio e Inicialize o RUN_WINDOWS.bat
+```
+
 
 ## Início Rápido
 
