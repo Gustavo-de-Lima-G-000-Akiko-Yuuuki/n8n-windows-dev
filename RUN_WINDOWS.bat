@@ -3,8 +3,7 @@ title n8n Local - Dev: Akiko_Yuuki
 setlocal EnableDelayedExpansion
 
 REM ============================================================
-REM    CABECALHO / MARCA D'AGUA
-REM    https://github.com/Gustavo-de-Lima-G-000-Akiko-Yuuuki
+REM    CABECALHO
 REM ============================================================
 echo.
 echo ============================================================
@@ -14,85 +13,78 @@ echo    Desenvolvido por: Gustavo de Lima Garcia (Akiko_Yuuki)
 echo ============================================================
 echo.
 
-REM --- Verificacao de Requisito: Node.js/NPM ---
+REM --- 1. Busca o caminho do NPM antes de tudo ---
+echo Verificando configuracoes do Node.js...
 where npm >nul 2>&1
 IF %ERRORLEVEL% NEQ 0 (
-    echo [ERRO] O NPM - Node.js - nao foi encontrado.
-    echo Para instalar o n8n, voce precisa do Node.js instalado.
-    echo Baixe em: https://nodejs.org/
+    echo [ERRO] Node.js nao encontrado. Instale em https://nodejs.org/
     pause
     exit /b
 )
 
-REM --- Verificacao do n8n ---
+REM Pega o caminho de instalacao global do NPM e adiciona ao PATH
+for /f "tokens=*" %%a in ('npm config get prefix') do set "NPM_PREFIX=%%a"
+set "PATH=!NPM_PREFIX!;!NPM_PREFIX!\bin;!PATH!"
+
+REM --- 2. Verifica se o n8n existe ---
+:VERIFICAR_N8N
 where n8n >nul 2>&1
-
-IF %ERRORLEVEL% NEQ 0 (
-    echo =======================================
-    echo   O n8n nao foi encontrado no sistema.
-    echo =======================================
-    echo.
-    
-    set /p "resposta=Deseja instalar o n8n agora? [Y/N]: "
-
-    if /I "!resposta!"=="Y" (
-        echo.
-        echo Instalando n8n globalmente...
-        echo (Ignore os avisos 'WARN' ou 'deprecated', isso e normal)
-        echo Isso pode levar alguns minutos...
-        echo.
-        
-        call npm install -g n8n
-
-        echo.
-        echo Atualizando caminhos do sistema...
-        
-        REM --- CORRECAO AQUI ---
-        REM O Windows nao atualiza o PATH em tempo real.
-        REM Forcamos a leitura do local de instalacao do NPM:
-        for /f "tokens=*" %%a in ('npm config get prefix') do set "NPM_PREFIX=%%a"
-        set "PATH=!NPM_PREFIX!;!PATH!"
-        REM ---------------------
-
-        echo Verificando instalacao...
-        where n8n >nul 2>&1
-        
-        IF !ERRORLEVEL! NEQ 0 (
-            echo.
-            echo ========================================================
-            echo ATENCAO: O n8n foi instalado, mas o Windows nao o viu.
-            echo Isso e normal na primeira vez.
-            echo.
-            echo Tente fechar esta janela e rodar o script novamente.
-            echo ========================================================
-            pause
-            exit /b
-        ) ELSE (
-            echo [SUCESSO] Instalacao concluida!
-        )
-    ) ELSE (
-        echo.
-        echo Instalacao cancelada pelo usuario.
-        pause
-        exit /b
-    )
-) ELSE (
-    echo [OK] n8n encontrado no sistema!
+IF %ERRORLEVEL% EQU 0 (
+    goto INICIAR_PROGRAMA
 )
 
-REM Define a pasta de trabalho para o perfil do usuario
+REM --- 3. Se nao encontrou, pergunta se quer instalar ---
+echo.
+echo =======================================
+echo   O n8n nao foi detectado neste computador.
+echo =======================================
+echo.
+set "resposta="
+set /p "resposta=Deseja instalar o n8n agora? [Y/N]: "
+
+if /I "!resposta!"=="Y" goto INSTALAR
+if /I "!resposta!"=="N" goto CANCELAR
+REM Se der enter sem digitar nada, assume cancelar
+goto CANCELAR
+
+:INSTALAR
+echo.
+echo Instalando n8n globalmente...
+echo Aguarde, isso pode demorar alguns minutos...
+echo.
+call npm install -g n8n
+
+echo.
+echo Verificando se a instalacao funcionou...
+where n8n >nul 2>&1
+IF %ERRORLEVEL% EQU 0 (
+    echo [SUCESSO] n8n instalado corretamente!
+    goto INICIAR_PROGRAMA
+) ELSE (
+    echo.
+    echo [ERRO] Ocorreu um erro na instalacao ou o Windows nao atualizou o caminho.
+    echo Tente fechar e abrir o script novamente.
+    pause
+    exit /b
+)
+
+:CANCELAR
+echo.
+echo Instalacao cancelada pelo usuario.
+pause
+exit /b
+
+:INICIAR_PROGRAMA
+echo.
+echo [OK] n8n encontrado!
+echo.
 cd /d "%USERPROFILE%"
-
-echo.
 echo ============================================================
-echo    Obrigado por utilizar esta ferramenta!
 echo    Iniciando servidor n8n...
+echo    Pressione Ctrl+C para parar.
 echo ============================================================
 echo.
-echo Pressione Ctrl+C para encerrar o servidor.
-echo.
 
-REM Inicia o n8n
 call n8n
 
 pause
